@@ -246,6 +246,9 @@ if __name__ == "__main__":
         global obj_cam_operation, win_display_handles, b_is_open, b_is_grab
         if (not b_is_open) or (b_is_grab):
             return
+        ui.pushButton_startGrab.setEnabled(False)
+        ui.pushButton_stopGrab.setEnabled(False)
+        QApplication.processEvents()  # 强制UI刷新，确保用户看到按钮被禁用
         grab_ok = False
         for i in range(0, NUM_CAMERAS):
             if obj_cam_operation[i] != 0:
@@ -272,6 +275,10 @@ if __name__ == "__main__":
         global b_is_grab, obj_cam_operation
         if not b_is_grab:
             return
+        # 在停止操作前，立即禁用按钮
+        ui.pushButton_startGrab.setEnabled(False)
+        ui.pushButton_stopGrab.setEnabled(False)
+        QApplication.processEvents()  # 强制UI刷新
         base_save_folder = os.path.join(os.getcwd(), "saved_images")
         os.makedirs(base_save_folder, exist_ok=True)
         for i in range(0, NUM_CAMERAS):
@@ -289,23 +296,71 @@ if __name__ == "__main__":
         except ValueError:
             return False
 
+    # def set_parameters():
+    #     global obj_cam_operation, b_is_open
+    #     if not b_is_open:
+    #         return
+    #     frame_rate = ui.lineEdit_frameRate.text()
+    #     exposure_time = ui.lineEdit_exposureTime.text()
+    #     gain = ui.lineEdit_gain.text()
+    #     if not is_float(frame_rate) or not is_float(exposure_time) or not is_float(gain):
+    #         print_text("Invalid parameter format. Please enter numeric values.")
+    #         return
+    #     for i in range(0, NUM_CAMERAS):
+    #         if obj_cam_operation[i] != 0:
+    #             obj_cam_operation[i].set_exposure_time(exposure_time)
+    #             obj_cam_operation[i].set_gain(gain)
+    #             obj_cam_operation[i].set_frame_rate(frame_rate)
+    #     print_text("Parameters applied to all open cameras.")
     def set_parameters():
         global obj_cam_operation, b_is_open
         if not b_is_open:
             return
-        frame_rate = ui.lineEdit_frameRate.text()
-        exposure_time = ui.lineEdit_exposureTime.text()
-        gain = ui.lineEdit_gain.text()
-        if not is_float(frame_rate) or not is_float(exposure_time) or not is_float(gain):
-            print_text("Invalid parameter format. Please enter numeric values.")
-            return
-        for i in range(0, NUM_CAMERAS):
-            if obj_cam_operation[i] != 0:
-                obj_cam_operation[i].set_exposure_time(exposure_time)
-                obj_cam_operation[i].set_gain(gain)
-                obj_cam_operation[i].set_frame_rate(frame_rate)
-        print_text("Parameters applied to all open cameras.")
 
+        exposure_time_str = ui.lineEdit_exposureTime.text()
+        gain_str = ui.lineEdit_gain.text()
+        frame_rate_str = ui.lineEdit_frameRate.text()
+
+        # 用于记录哪些参数被成功应用
+        params_successfully_set = []
+
+        # 1. 独立检查并设置曝光时间
+        if exposure_time_str:  # 首先检查输入框是否为空
+            if is_float(exposure_time_str):
+                for i in range(0, NUM_CAMERAS):
+                    if obj_cam_operation[i] != 0:
+                        obj_cam_operation[i].set_exposure_time(exposure_time_str)
+                params_successfully_set.append("Exposure")
+            else:
+                print_text(f"错误: 曝光时间值 '{exposure_time_str}' 无效，未应用。")
+
+        # 2. 独立检查并设置增益
+        if gain_str:  # 检查增益输入框是否为空
+            if is_float(gain_str):
+                for i in range(0, NUM_CAMERAS):
+                    if obj_cam_operation[i] != 0:
+                        obj_cam_operation[i].set_gain(gain_str)
+                params_successfully_set.append("Gain")
+            else:
+                print_text(f"错误: 增益值 '{gain_str}' 无效，未应用。")
+
+        # 3. 独立检查并设置帧率
+        if frame_rate_str:  # 检查帧率输入框是否为空
+            if is_float(frame_rate_str):
+                for i in range(0, NUM_CAMERAS):
+                    if obj_cam_operation[i] != 0:
+                        obj_cam_operation[i].set_frame_rate(frame_rate_str)
+                params_successfully_set.append("Frame Rate")
+            else:
+                print_text(f"错误: 帧率值 '{frame_rate_str}' 无效，未应用。")
+
+        # 根据是否有参数被成功设置来提供反馈
+        if params_successfully_set:
+            # 使用 ', '.join() 来创建一个清晰的列表，例如 "Exposure, Gain"
+            print_text(f"成功应用参数: {', '.join(params_successfully_set)}.")
+        else:
+            # 如果所有输入框都为空，或者填写的值都无效，则给出此提示
+            print_text("没有输入任何有效的参数。")
     def trigger_camera_thread(cam_op, cam_index):
         ret = cam_op.trigger_once()
         if ret != 0:
@@ -319,6 +374,8 @@ if __name__ == "__main__":
                 threads.append(thread)
         for thread in threads:
             thread.start()
+            
+        enable_ui_controls()
         
     app = QApplication(sys.argv)
     mainWindow = QMainWindow()
