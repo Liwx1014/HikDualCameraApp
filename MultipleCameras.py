@@ -232,11 +232,11 @@ if __name__ == "__main__":
         if not b_is_open:
             return
         if b_is_grab:
+            print_text(f'stop grab before close device')
             stop_grabbing()
         for i in range(0, NUM_CAMERAS):
             if obj_cam_operation[i] != 0:
                 obj_cam_operation[i].close_device()
-        
         for i in range(0, valid_number):
             cam_button_group.button(i).setEnabled(True)
         b_is_open = False
@@ -295,23 +295,6 @@ if __name__ == "__main__":
             return True
         except ValueError:
             return False
-
-    # def set_parameters():
-    #     global obj_cam_operation, b_is_open
-    #     if not b_is_open:
-    #         return
-    #     frame_rate = ui.lineEdit_frameRate.text()
-    #     exposure_time = ui.lineEdit_exposureTime.text()
-    #     gain = ui.lineEdit_gain.text()
-    #     if not is_float(frame_rate) or not is_float(exposure_time) or not is_float(gain):
-    #         print_text("Invalid parameter format. Please enter numeric values.")
-    #         return
-    #     for i in range(0, NUM_CAMERAS):
-    #         if obj_cam_operation[i] != 0:
-    #             obj_cam_operation[i].set_exposure_time(exposure_time)
-    #             obj_cam_operation[i].set_gain(gain)
-    #             obj_cam_operation[i].set_frame_rate(frame_rate)
-    #     print_text("Parameters applied to all open cameras.")
     def set_parameters():
         global obj_cam_operation, b_is_open
         if not b_is_open:
@@ -381,38 +364,38 @@ if __name__ == "__main__":
     mainWindow = QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(mainWindow)
+    try:
+        ui.pushButton_enum.clicked.connect(enum_devices)
+        ui.pushButton_open.clicked.connect(open_devices)
+        ui.pushButton_close.clicked.connect(close_devices)
+        ui.pushButton_startGrab.clicked.connect(start_grabbing)
+        ui.pushButton_stopGrab.clicked.connect(stop_grabbing)
+        ui.pushButton_saveImg.clicked.connect(save_bmp)
+        ui.pushButton_setParams.clicked.connect(set_parameters)
+        ui.pushButton_triggerOnce.clicked.connect(software_trigger_once)
+        
+        ui.comboBox_triggerSource.currentTextChanged.connect(trigger_source_changed)
+        
+        cam_button_group = QButtonGroup(mainWindow)
+        cam_button_group.addButton(ui.checkBox_1, 0)
+        cam_button_group.addButton(ui.checkBox_2, 1)
+        cam_button_group.setExclusive(False)
+        cam_button_group.buttonClicked.connect(cam_check_box_clicked)
 
-    ui.pushButton_enum.clicked.connect(enum_devices)
-    ui.pushButton_open.clicked.connect(open_devices)
-    ui.pushButton_close.clicked.connect(close_devices)
-    ui.pushButton_startGrab.clicked.connect(start_grabbing)
-    ui.pushButton_stopGrab.clicked.connect(stop_grabbing)
-    ui.pushButton_saveImg.clicked.connect(save_bmp)
-    ui.pushButton_setParams.clicked.connect(set_parameters)
-    ui.pushButton_triggerOnce.clicked.connect(software_trigger_once)
-    
-    ui.comboBox_triggerSource.currentTextChanged.connect(trigger_source_changed)
-    
-    cam_button_group = QButtonGroup(mainWindow)
-    cam_button_group.addButton(ui.checkBox_1, 0)
-    cam_button_group.addButton(ui.checkBox_2, 1)
-    cam_button_group.setExclusive(False)
-    cam_button_group.buttonClicked.connect(cam_check_box_clicked)
+        raio_button_group = QButtonGroup(mainWindow)
+        raio_button_group.addButton(ui.radioButton_continuous, 0)
+        raio_button_group.addButton(ui.radioButton_trigger, 1)
+        raio_button_group.buttonClicked.connect(radio_button_clicked)
 
-    raio_button_group = QButtonGroup(mainWindow)
-    raio_button_group.addButton(ui.radioButton_continuous, 0)
-    raio_button_group.addButton(ui.radioButton_trigger, 1)
-    raio_button_group.buttonClicked.connect(radio_button_clicked)
+        win_display_handles.append(ui.widget_display1.winId())
+        win_display_handles.append(ui.widget_display2.winId())
 
-    win_display_handles.append(ui.widget_display1.winId())
-    win_display_handles.append(ui.widget_display2.winId())
+        mainWindow.show()
+        enum_devices()
+        enable_ui_controls()
 
-    mainWindow.show()
-    enum_devices()
-    enable_ui_controls()
-
-    app.exec_()
-
-    close_devices()
-    MvCamera.MV_CC_Finalize()
-    sys.exit()
+        sys.exit(app.exec_())
+    finally:
+        
+        close_devices()
+        MvCamera.MV_CC_Finalize()
