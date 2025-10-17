@@ -13,19 +13,23 @@
 - [x] 双目矫正
 
 ## 代码说明
-[双目在线标定代码](calibrate_dua.py)
-[双目USB在线标定代码](calibrate_sig.py)  一般指双目模组
-[离线标定](calibrate_local.py)
-[矫正](stereo_rectification.py)
-[双目测距]()
+- [双目在线标定代码](calibrate_dua.py)
+- [双目USB在线标定代码](calibrate_sig.py)  一般指双目模组
+- [离线标定](calibrate_local.py)
+- [矫正](stereo_rectification.py)
+- [双目测距]()
 
+## 参考
+- [Matlab标定](https://blog.csdn.net/weixin_43956351/article/details/94394892)
+- [参考项目](https://github.com/TemugeB/python_stereo_camera_calibrate#)
+- [其他标定工具](https://github.com/ethz-asl/kalibr)
+  
 ### 运行
-
 ```python3 calibrate_local.py cal ibration_settings_hik.yaml  cali_image```
-具体过程参考[标定流程](https://github.com/TemugeB/python_stereo_camera_calibrate#)
 标定是整个测距的基石，在采集图像时一定要保证图像清晰选取大的、坚硬棋盘格、多种角度（倾斜、反转、旋转，不同深度）下采集，这样计算出来的内参足够鲁棒性。
 ## 技术文档
 [官方技术说明](https://www.hikrobotics.com/cn/machinevision/visionproduct?typeId=27&id=249&pageNumber=1&pageSize=20&showEol=false)
 
 [硬触发技术文档](开发说明.md)
+
 
