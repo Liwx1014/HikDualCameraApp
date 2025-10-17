@@ -25,11 +25,14 @@
 - [其他标定工具](https://github.com/ethz-asl/kalibr)
   
 ### 运行
-```python3 calibrate_local.py cal ibration_settings_hik.yaml  cali_image```
+```
+python3 calibrate_local.py cal ibration_settings_hik.yaml  cali_image
+```
 标定是整个测距的基石，在采集图像时一定要保证图像清晰选取大的、坚硬棋盘格、多种角度（倾斜、反转、旋转，不同深度）下采集，这样计算出来的内参足够鲁棒性。
 ## 技术文档
 [官方技术说明](https://www.hikrobotics.com/cn/machinevision/visionproduct?typeId=27&id=249&pageNumber=1&pageSize=20&showEol=false)
 
 [硬触发技术文档](开发说明.md)
+
 
 
