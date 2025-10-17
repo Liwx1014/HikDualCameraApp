@@ -1,0 +1,17 @@
+# Use a single device ID for the stereo camera
+stereo_camera_device_id: 0 # Or whatever your camera's ID is
+
+# Set the FULL width of the combined camera feed
+frame_width: 3840
+frame_height: 1080
+
+# The rest of the settings remain the same
+mono_calibration_frames: 10
+stereo_calibration_frames: 10
+view_resize: 2 # Increase this if the display windows are too large
+cooldown: 20
+
+# Checkerboard settings
+checkerboard_rows: 8
+checkerboard_columns: 8
+checkerboard_box_size_scale: 1.8
